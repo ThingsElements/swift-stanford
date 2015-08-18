@@ -50,6 +50,32 @@ public class CalculatorBrain {
         knownOps["√"] = Op.UnaryOperation("√", sqrt)
     }
     
+    typealias PropertyList = AnyObject
+    
+    var program: PropertyList {    // guaranteed to be a PropertyList
+        get {
+            return opStack.map { $0.description }
+//            var returnValue: Array<String>()
+//            for op in opStack {
+//                returnValue.append(op.description)
+//            }
+//            return returnValue
+        }
+        set {
+            if let opSymbols = newValue as? Array<String> {
+                var newOpStack = [Op]()
+                for opSymbol in opSymbols {
+                    if let op = knownOps[opSymbol] {
+                        newOpStack.append(op)
+                    } else if let operand = NSNumberFormatter().numberFromString(opSymbol)?.doubleValue {
+                        newOpStack.append(.Operand(operand))
+                    }
+                }
+                opStack = newOpStack
+            }
+        }
+    }
+    
     private func evaluate(ops: [Op]) -> (result: Double?, remainingOps: [Op]) {     // Array and Dictionary(even int and double) are Structure. Structure passed by value, class passed by referrence
         if !ops.isEmpty {
             var remainingOps = ops  // get value copy, but not really copy.
